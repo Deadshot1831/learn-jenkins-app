@@ -24,7 +24,10 @@ pipeline {
         steps{
         echo "Test Stage"
         sh '''
-        test -f build/index.html && echo "Exist"||echo "Not Found"
+        set -e 
+        echo "Running Test..."
+        npm test
+        echo "Test completed Successfully"
         '''
         }
     }
