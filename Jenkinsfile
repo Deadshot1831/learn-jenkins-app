@@ -6,8 +6,8 @@ pipeline {
         line 1
         line 2 
         stage('Build') {
-            agent{
-                docker{
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
@@ -21,46 +21,47 @@ pipeline {
                 npm run build
                 ls -la
                 '''
-        }
-    }
-    */
-    stage ('Test'){
-           agent{
-                docker{
+            }
+        } */
+
+        stage('Test') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
-        steps{
-        echo "Test Stage"
-        sh '''
-        set -e 
-        echo "Running Test..."
-        npm test
-        echo "Test completed Successfully"
-        '''
+            steps {
+                echo "Test Stage"
+                sh '''
+                set -e 
+                echo "Running Test..."
+                npm test
+                echo "Test completed Successfully"
+                '''
+            }
         }
-    }
-}
- stage ('E2E'){
-           agent{
-                docker{
+
+        stage('E2E') {
+            agent {
+                docker {
                     image 'mcr.microsoft.com/playwright:v1.56.1-noble'
                     reuseNode true
                 }
             }
-        steps{
-        sh '''
-        npm install -g serve 
-        serve -s build
-        npx playwright test
-        '''
+            steps {
+                sh '''
+                npm install -g serve 
+                serve -s build &
+                npx playwright test
+                '''
+            }
         }
     }
-}
-post {
-    always{
-        junit 'test-results/junit.xml'
+
+    post {
+        always {
+            junit 'test-results/junit.xml'
+        }
     }
-}
 }
