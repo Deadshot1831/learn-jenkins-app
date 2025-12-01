@@ -24,7 +24,6 @@ pipeline {
       }
     }
 
-
     stage('Tests') {
       parallel {
 
@@ -99,8 +98,5 @@ pipeline {
         '''
       }
     }
-
-
   }
-
 }
