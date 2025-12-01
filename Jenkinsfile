@@ -2,9 +2,10 @@ pipeline {
   agent any
 
   environment {
-    NETLIFY_SITE_ID = '26cea4a9-c8b7-45e9-ac86-cea792c200e6'
+    NETLIFY_SITE_ID   = '26cea4a9-c8b7-45e9-ac86-cea792c200e6'
     NETLIFY_AUTH_TOKEN = credentials('netlify-token')
   }
+
   stages {
     /*
     line 1
@@ -97,11 +98,20 @@ pipeline {
       }
       steps {
         sh '''
+        node --version
+        npm --version
+
+        # Install Netlify CLI locally
         npm install netlify-cli
-        npx netlify --version
+
         echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-        npx netlify status
-        npx netlify deploy --dir=build --prod
+
+        # Deploy pre-built assets, skip Netlify build & plugins (no Lighthouse/Puppeteer)
+        npx netlify deploy \
+          --dir=build \
+          --prod \
+          --site="$NETLIFY_SITE_ID" \
+          --no-build
         '''
       }
     }
