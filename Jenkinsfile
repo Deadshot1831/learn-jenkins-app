@@ -4,6 +4,7 @@ pipeline {
   environment {
     NETLIFY_SITE_ID   = '26cea4a9-c8b7-45e9-ac86-cea792c200e6'
     NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+    CI_ENVIRONMENT_URL = 'https://verdant-creponne-a7f9cc.netlify.app/'
   }
 
   stages {
@@ -80,7 +81,7 @@ pipeline {
                 keepAll: false,
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
-                reportName: 'Playwright HTML Report',
+                reportName: 'Playwright local',
                 reportTitles: ''
               ])
             }
@@ -116,5 +117,38 @@ pipeline {
         '''
       }
     }
+
+  stage('Prod E2E') {
+        agent {
+          docker {
+            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+            reuseNode true
+          }
+        }
+
+        environment {
+        NETLIFY_SITE_ID   = '26cea4a9-c8b7-45e9-ac86-cea792c200e6'
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        CI_ENVIRONMENT_URL = 'https://verdant-creponne-a7f9cc.netlify.app'
+        }
+        steps {
+          sh '''
+          npx playwright test --reporter=html
+          '''
+        }
+        post {
+          always {
+            publishHTML([
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: false,
+              reportDir: 'playwright-report',
+              reportFiles: 'index.html',
+              reportName: 'Playwright E2E ',
+              reportTitles: ''
+            ])
+          }
+        }
+      }
   }
 }
