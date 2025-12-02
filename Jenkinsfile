@@ -45,7 +45,7 @@ pipeline {
             sh '''
             set -e
             echo "Running Test..."
-            echo"small changes"
+            echo "small changes"
             npm test
             echo "Test completed Successfully"
             '''
